@@ -1,65 +1,75 @@
+# VIBRANCY AI — Generation X Workspace
 
-# DevHub — Developer Toolbox
+Created by **Sayeef Adnan**.
 
-A free, browser-based collection of essential developer utilities built with HTML, CSS, and vanilla JavaScript.
-
-**Created by Sayeef Adnan (সাঈফ আদনান)**
+This project is a futuristic, responsive AI-chat interface built with plain HTML, CSS, and JavaScript. It is suitable for GitHub Pages as a frontend. It does **not** include an AI provider key or a production backend.
 
 ## Features
 
-- JSON Formatter, Minifier & Validator
-- Base64 Encoder / Decoder with Unicode support
-- UUID v4 Generator with text export
-- HEX, RGB & HSL Color Converter
-- CSS Gradient Generator
-- JavaScript Regex Tester
-- JWT Header & Payload Decoder
-- Dark / Light Theme
-- Responsive Layout
-- Clipboard Copy Support
-- No account or backend required
+- Responsive sidebar and mobile navigation drawer
+- New conversations, locally saved conversation history, rename-by-first-message, and delete
+- Prompt suggestions and prompt library
+- Markdown-style response formatting and copy controls
+- Export conversation as Markdown
+- Text-file attachment (content is sent with the next prompt)
+- Dark/light appearance preferences
+- Configurable backend endpoint
+- Honest setup/error states when no backend is connected
+- Reduced-motion support and keyboard controls
 
-## Getting Started
+## Run locally
 
-1. Clone this repository:
+Open `index.html` in a modern browser. For best results, use a local static server (for example, VS Code Live Server). No build step is required.
 
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/devhub-developer-toolbox.git
-   ```
+## Connect a real AI backend
 
-2. Open the project folder.
-3. Open `index.html` in your browser.
+Open **Connection settings** in the app and enter your backend endpoint. The frontend sends:
 
-No package installation or build process is required.
+```json
+{
+  "messages": [
+    {"role": "user", "content": "Hello"}
+  ],
+  "stream": false
+}
+```
 
-## Live Demo
+The endpoint should return JSON with a string field named `reply`, `message`, or `content`, for example:
 
-After enabling GitHub Pages, add your published URL here.
+```json
+{"reply":"Hello! How can I help?"}
+```
 
-## Technology Stack
+Your backend must:
+- call the AI provider server-side;
+- keep provider API keys in server environment variables;
+- validate requests and enforce rate limits;
+- set CORS to allow only the intended website origin;
+- handle provider errors and timeouts;
+- avoid logging private conversation data unnecessarily.
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- Browser APIs
+Do not paste provider API keys into this static site, localStorage, or a public repository. GitHub Pages serves static files and does not run a private backend by itself.
 
-## Privacy
+## Security action required
 
-Tool inputs are processed locally in your browser. The application does not intentionally transmit input data to a backend.
+The previous version of `index.html` contained API-key-looking values in client-side JavaScript. Treat any credentials that were ever committed to a public repository as exposed: review the relevant provider dashboards, revoke/rotate those credentials if they are real, and check usage. Removing a key from the latest file does not erase it from Git history.
 
-Avoid entering sensitive tokens or credentials into shared devices.
+## Known limitations
 
-## Security Notice
+- Real AI responses require a compatible backend endpoint.
+- File attachment currently supports text-like files only and sends their text content with the next message.
+- Conversation history is stored in the current browser only; it does not synchronize across devices.
+- No authentication or multi-user database is included.
+- The frontend expects a JSON response, not a streaming response.
 
-The JWT tool decodes tokens but does not verify signatures.
-Base64 is encoding, not encryption.
+## Deploy to GitHub Pages
 
-## Author
+1. Replace the repository's `index.html` with this file.
+2. Commit and push the change.
+3. In GitHub, open **Settings → Pages** and confirm the desired branch/folder is published.
+4. Configure a separate backend if you want live AI responses.
 
-**Sayeef Adnan (সাঈফ আদনান)**
+## Project identity
 
-GitHub: https://github.com/sayeefadnan986-bit
-
-## License
-
-MIT License — see the LICENSE file.
+**VIBRANCY AI — Generation X Workspace**  
+Created and designed by **Sayeef Adnan**.
