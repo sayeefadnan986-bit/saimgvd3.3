@@ -1,1 +1,595 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<title>VIBRANCY AI — Media Chat</title>
+<style>
+  :root{
+ --bg:#070912;--panel:#101523;--panel-2:#151d30;--line:#ffffff14;
+ --line-strong:#b5c6ff2c;--text:#f5f7ff;--muted:#a3aec5;
+ --cyan:#70f4f0;--purple:#a99bff;--blue:#8dbdff;--green:#8af0be;
+ --shadow:0 22px 70px #0005;--radius:20px;
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg);scroll-behavior:smooth}
+body{
+ margin:0;min-height:100dvh;color:var(--text);
+ font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Bengali",sans-serif;
+ background:radial-gradient(ellipse at 52% -20%,#343e7950,transparent 48%),radial-gradient(ellipse at 100% 40%,#2c205020,transparent 35%),var(--bg);
+ background-attachment:fixed
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+a{color:var(--cyan)}
+header{
+ position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:14px;
+ padding:13px clamp(14px,3vw,34px);background:#090c16d9;backdrop-filter:blur(24px) saturate(150%);
+ border-bottom:1px solid var(--line);box-shadow:0 8px 35px #00012
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{
+ width:44px;height:44px;flex:0 0 44px;border-radius:15px;display:grid;place-items:center;font-size:23px;font-weight:900;
+ background:linear-gradient(135deg,var(--cyan),var(--blue) 48%,var(--purple));color:#07111b;
+ box-shadow:0 0 32px #70f4f01c,inset 0 1px #ffffff8a
+}
+.brand strong{font-size:13px;letter-spacing:.14em;white-space:nowrap}
+.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.04em;margin-top:4px}
+.online{
+ display:flex;align-items:center;gap:8px;white-space:nowrap;font-size:10px;font-weight:750;letter-spacing:.07em;
+ color:var(--green);padding:8px 12px;border:1px solid #8af0be20;background:#8af0be0a;border-radius:999px
+}
+.online:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #8af0be8a}
+main{width:min(1100px,100%);margin:auto;padding:clamp(16px,3vw,30px) clamp(12px,2vw,22px) 185px}
+.welcome{text-align:center;padding:clamp(25px,5vw,54px) 8px 34px;animation:fadeUp .55s ease both}
+.orb{
+ margin:0 auto 23px;width:78px;height:78px;border-radius:25px;display:grid;place-items:center;font-size:35px;
+ color:#09111a;background:linear-gradient(140deg,var(--cyan),var(--blue) 50%,var(--purple));
+ border:1px solid #ffffff3b;box-shadow:0 0 70px #70f4f01c,0 12px 40px #0004;position:relative;animation:float 5s ease-in-out infinite
+}
+.orb:after{content:"";position:absolute;inset:-7px;border:1px solid #9cc9ff26;border-radius:31px;pointer-events:none}
+@keyframes float{50%{transform:translateY(-5px);box-shadow:0 0 82px #9d8dff27,0 12px 40px #0004}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h1{font-size:clamp(29px,5.5vw,48px);line-height:1.12;letter-spacing:-.045em;margin:0 0 14px;font-weight:850}
+h1 span{background:linear-gradient(100deg,var(--cyan),var(--blue) 50%,var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.welcome p{color:var(--muted);line-height:1.9;font-size:clamp(12px,1.8vw,14px);margin:0}
+.suggestions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:25px}
+.suggestion,.smallbtn{
+ color:#dce6fa;border:1px solid var(--line-strong);border-radius:14px;padding:11px 15px;font-size:12px;font-weight:650;
+ background:linear-gradient(145deg,#ffffff0b,#ffffff03);box-shadow:inset 0 1px #ffffff08;
+ transition:transform .18s,border-color .18s,background .18s
+}
+.suggestion:hover,.smallbtn:hover{border-color:#70f4f078;background:#70f4f00c;transform:translateY(-2px)}
+#chat{display:flex;flex-direction:column;gap:23px}
+.message{display:flex;gap:11px;align-items:flex-start;animation:fadeUp .22s ease both}
+.message.user{justify-content:flex-end}
+.avatar{
+ flex:0 0 35px;width:35px;height:35px;border-radius:13px;display:grid;place-items:center;
+ background:linear-gradient(145deg,#1a3145,#1a1c37);border:1px solid #9fc7ff24;font-size:15px;color:var(--cyan);
+ box-shadow:0 5px 18px #0002
+}
+.message.user .avatar{order:2;background:linear-gradient(145deg,#292849,#24203e);color:#d1c6ff}
+.bubble{
+ max-width:min(90%,820px);min-width:0;padding:15px 17px;background:linear-gradient(145deg,#141b2b,#101523);
+ border:1px solid var(--line-strong);border-radius:6px 19px 19px 19px;line-height:1.8;overflow-wrap:anywhere;
+ box-shadow:0 12px 35px #00016
+}
+.message.user .bubble{background:linear-gradient(145deg,#1b2943,#1a2036);border-color:#86aaff36;border-radius:19px 6px 19px 19px}
+.bubble p{margin:0 0 9px}.bubble p:last-child{margin-bottom:0}
+.bubble a{overflow-wrap:anywhere}
+.muted{color:var(--muted);font-size:12px}
+.typing{display:flex;align-items:center;gap:7px;color:var(--cyan);font-size:12px}
+.dot{width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px #70f4f055;animation:pulse 1s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes pulse{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.scan{height:3px;border-radius:9px;background:#ffffff0b;overflow:hidden;margin:14px 0}
+.scan:after{content:"";display:block;width:35%;height:100%;background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent);animation:scan 1.3s linear infinite}
+@keyframes scan{from{transform:translateX(-110%)}to{transform:translateX(310%)}}
+.resultgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.media{min-width:0;overflow:hidden;background:linear-gradient(145deg,#141b2a,#0c101a);border:1px solid var(--line-strong);border-radius:16px;box-shadow:0 12px 35px #0002;transition:transform .2s,border-color .2s,box-shadow .2s}
+.media:hover{transform:translateY(-3px);border-color:#70f4f04a;box-shadow:0 18px 40px #0003}
+.media img,.media video{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:#0b1220;transition:transform .35s}
+.media:hover img{transform:scale(1.025)}
+.media video{object-fit:contain}
+.media-body{padding:12px}
+.media-title{font-size:12px;font-weight:700;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:37px}
+.source{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);margin:7px 0 11px}
+.media-actions{display:flex;gap:7px}
+.media-actions a{flex:1;min-width:0;text-decoration:none}
+.media-actions button{width:100%;font-size:11px;padding:10px 5px;white-space:nowrap}
+.primary,.secondary{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:11px;padding:11px 15px;font-size:12px;font-weight:800;
+ transition:transform .18s,filter .18s,border-color .18s
+}
+.primary{color:#08111b;border:0;background:linear-gradient(110deg,var(--cyan),var(--blue) 55%,#b7a3ff);box-shadow:0 5px 20px #70f4f013}
+.secondary{color:#e0e7f8;background:#ffffff07;border:1px solid var(--line-strong)}
+.primary:hover,.secondary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.loadmore{margin-top:15px}
+.toolbar{
+ position:fixed;bottom:0;left:0;right:0;z-index:20;background:#090c16ef;border-top:1px solid var(--line);
+ padding:12px 14px max(12px,env(safe-area-inset-bottom));backdrop-filter:blur(26px) saturate(160%);
+ box-shadow:0 -18px 55px #00025
+}
+.composer{max-width:960px;margin:auto}
+.filters{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 auto 11px;max-width:960px;padding:13px;border:1px solid var(--line-strong);border-radius:16px;background:#111624;box-shadow:var(--shadow)}
+.filters.show{display:grid}
+.filters label{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.filters select,.filters input{display:block;width:100%;margin-top:6px;padding:10px 11px;color:var(--text);background:#0a0e18;border:1px solid var(--line-strong);border-radius:11px;min-width:0}
+.filters select:focus,.filters input:focus{border-color:#70f4f080;outline:none}
+.inputrow{
+ max-width:960px;margin:auto;display:flex;align-items:flex-end;gap:9px;padding:9px;
+ background:linear-gradient(145deg,#141b2a,#0f1420);border:1px solid #b4c5ff36;border-radius:19px;
+ box-shadow:0 10px 35px #0002,inset 0 1px #ffffff08;transition:border-color .2s,box-shadow .2s
+}
+.inputrow:focus-within{border-color:#70f4f077;box-shadow:0 0 0 3px #70f4f00b,0 12px 40px #0003}
+#prompt{flex:1;min-width:0;max-height:120px;resize:vertical;border:0;outline:0;background:transparent;color:var(--text);padding:10px 6px;line-height:1.6;font-size:13px}
+#prompt::placeholder{color:#7f8ba5}
+.iconbtn{flex:0 0 auto;width:41px;height:41px;border-radius:13px;border:1px solid var(--line-strong);background:#ffffff07;color:#dce6fa;display:grid;place-items:center;transition:background .18s,border-color .18s,transform .18s}
+.iconbtn:hover{background:#70f4f012;border-color:#70f4f05c;transform:translateY(-1px)}
+#send{background:linear-gradient(135deg,var(--cyan),var(--blue) 60%,var(--purple));color:#07111a;border:0;font-size:18px;font-weight:900;box-shadow:0 4px 22px #70f4f021}
+.composer-note{text-align:center;color:#7f8ba3;font-size:10px;margin-top:9px;line-height:1.5}
+.empty{padding:15px;border:1px dashed #52607a;border-radius:13px;color:var(--muted);background:#ffffff03}
+@media(min-width:650px){.resultgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:900px){.resultgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:560px){
+ header{padding:10px 12px;gap:8px}.logo{width:39px;height:39px;flex-basis:39px;border-radius:13px}.brand{gap:9px}.brand strong{font-size:11px;letter-spacing:.11em}.brand small{font-size:9px}.online{padding:7px 9px;font-size:9px}
+ main{padding:14px 10px 178px}.welcome{padding:29px 5px 26px}.orb{width:66px;height:66px;border-radius:22px;font-size:29px;margin-bottom:19px}
+ .welcome p br{display:none}.suggestions{gap:7px;margin-top:20px}.suggestion{padding:10px 11px;font-size:11px}
+ #chat{gap:17px}.message{gap:8px}.avatar{width:30px;height:30px;flex-basis:30px;border-radius:11px}.bubble{max-width:calc(100% - 38px);padding:12px 13px;font-size:13px}
+ .resultgrid{gap:8px}.media{border-radius:13px}.media-body{padding:9px}.media-title{font-size:11px;min-height:34px}.source{font-size:9px;margin:6px 0 9px}.media-actions{gap:5px}.media-actions button{font-size:10px;padding:9px 3px}
+ .toolbar{padding:9px 9px max(9px,env(safe-area-inset-bottom))}.inputrow{gap:6px;padding:7px;border-radius:16px}.iconbtn{width:38px;height:38px;border-radius:11px}#prompt{font-size:12px;padding:8px 4px}
+ .filters{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px;gap:8px}.filters label{font-size:10px}.filters select,.filters input{padding:9px 7px;font-size:11px}.composer-note{font-size:9px}
+}
+@media(max-width:360px){.resultgrid{grid-template-columns:1fr}.online{font-size:0;gap:0;padding:9px}.online:before{width:7px;height:7px}.brand strong{font-size:10px}.suggestion{font-size:10px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">
+  <div class="logo">✦</div>
+  <div><strong>VIBRANCY <span style="color:#58e7ff">AI</span></strong>
+   <small>Universal Media Assistant</small>
+  </div>
+ </div>
+ <div class="online">Media search</div>
+</header>
+
+<main>
+ <section class="welcome" id="welcome">
+  <div class="orb">✧</div>
+  <h1>Imagine it. <span>Find it.</span></h1>
+  <p>তুমি কী খুঁজছ আমাকে বলো। আমি বিভিন্ন মিডিয়া লাইব্রেরি থেকে<br>
+   তোমার জন্য প্রাসঙ্গিক ছবি ও ভিডিও খুঁজে দেব।</p>
+  <div class="suggestions">
+   <button class="suggestion" data-prompt="আমাকে ১২টি মহাকাশের ছবি দেখাও">🌌 মহাকাশের ছবি</button>
+   <button class="suggestion" data-prompt="আমাকে ৮টি প্রকৃতির ভিডিও দেখাও">🌿 প্রকৃতির ভিডিও</button>
+   <button class="suggestion" data-prompt="আমাকে ২০টি ফুটবলের ছবি দেখাও">⚽ ফুটবলের ছবি</button>
+  </div>
+ </section>
+ <section id="chat" aria-live="polite"></section>
+</main>
+
+<div class="toolbar">
+ <div class="filters" id="filters">
+  <label>মিডিয়া
+   <select id="kind">
+    <option value="photo">ছবি</option>
+    <option value="video">ভিডিও</option>
+   </select>
+  </label>
+  <label>রেজাল্টের সংখ্যা
+   <input id="count" type="number" min="1" step="1" value="12">
+  </label>
+  <label>সার্চ সোর্স
+   <select id="source">
+    <option value="all">সব সক্রিয় সোর্স</option>
+    <option value="pexels">Pexels</option>
+    <option value="pixabay">Pixabay</option>
+    <option value="unsplash">Unsplash</option>
+    <option value="mixkit">Mixkit</option>
+   </select>
+  </label>
+ </div>
+ <div class="composer">
+  <div class="inputrow">
+   <button class="iconbtn" id="filterBtn" title="সার্চ ফিল্টার">☷</button>
+   <textarea id="prompt" rows="1"
+    placeholder="আমাকে ২০টি পাহাড়ের ছবি দেখাও..." aria-label="তোমার প্রশ্ন"></textarea>
+   <button class="iconbtn" id="send" title="Send">➤</button>
+  </div>
+  <div class="composer-note">ছবি ও ভিডিও খোঁজার সহকারী · ফলাফল মূল সোর্স থেকে আসে</div>
+ </div>
+</div>
+
+<script>
+"use strict";
+
+/*
+  এখানে নিজের নতুন API key বসাও।
+  পাবলিক GitHub Pages-এ key রাখলে অন্যরা তা দেখতে ও ব্যবহার করতে পারে।
+  নিরাপদ প্রকাশের জন্য server-side proxy ব্যবহার করো।
+*/
+const API = {
+  PEXELS: "PASTE_NEW_PEXELS_KEY_HERE",
+  PIXABAY: "58088897-ba06eba3bc15df54233381951",
+  UNSPLASH: "jSk-OvCQz69SUVU9KR5U4SQZx7H4Z7Ei8rBexw9aPg8"
+};
+
+const $ = id => document.getElementById(id);
+const chat = $("chat");
+
+let currentJob = null;
+let activeResults = [];
+let activeQuery = "";
+let nextPage = 1;
+let exhausted = false;
+
+function safeURL(value) {
+  try {
+    const u = new URL(value);
+    return ["https:", "http:"].includes(u.protocol) ? u.href : "";
+  } catch { return ""; }
+}
+
+function addMessage(who, html) {
+  $("welcome").style.display = "none";
+  const row = document.createElement("div");
+  row.className = "message " + who;
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = who === "user" ? "☺" : "✦";
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.innerHTML = html;
+  row.append(avatar, bubble);
+  chat.appendChild(row);
+  row.scrollIntoView({behavior:"smooth", block:"nearest"});
+  return bubble;
+}
+
+function loadingBubble(query) {
+  const b = addMessage("bot", `
+    <div class="typing"><span class="dot"></span><span class="dot"></span>
+    <span class="dot"></span> তোমার জন্য খুঁজছি...</div>
+    <div class="scan"></div>
+    <div class="muted">বিষয়: ${escapeHTML(query)}</div>
+  `);
+  return b;
+}
+
+function escapeHTML(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[c]));
+}
+
+function getRequestedCount(text) {
+  const n = Number($("count").value);
+  if (!Number.isSafeInteger(n) || n < 1) {
+    throw new Error("রেজাল্টের সংখ্যা ১ বা তার বেশি পূর্ণসংখ্যা হতে হবে।");
+  }
+  // বাংলা বা ইংরেজি সংখ্যা কথায় থাকলেও সাধারণভাবে ধরার চেষ্টা।
+  const digits = String(text).replace(/[০-৯]/g, d =>
+    "০১২৩৪৫৬৭৮৯".indexOf(d));
+  const match = digits.match(/(\d+)\s*(?:টি|টা|খানা|images?|photos?|pictures?|videos?|results?)/i);
+  return match ? Math.max(1, Number(match[1])) : n;
+}
+
+function normalizeQuery(text) {
+  return text
+    .replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d))
+    .replace(/\b(?:আমাকে|দেখাও|দেখাতে|দাও|খুঁজে|খুঁজো|দেখতে|চাই|প্লিজ|please|show|find|give|me|search|for|photos?|pictures?|images?|videos?|clips?)\b/gi, " ")
+    .replace(/\d+\s*(?:টি|টা|খানা|images?|photos?|pictures?|videos?|results?)/gi, " ")
+    .replace(/\s+/g, " ").trim() || text.trim();
+}
+
+function sourceLinks(query, kind) {
+  const q = encodeURIComponent(query);
+  return {
+    Pexels: `https://www.pexels.com/search/${kind === "video" ? "videos" : "photos"}/${q}/`,
+    Pixabay: `https://pixabay.com/${kind === "video" ? "videos" : "images"}/search/${q}/`,
+    Unsplash: `https://unsplash.com/s/photos/${q}`,
+    Mixkit: `https://mixkit.co/free-stock-video/?q=${q}`
+  };
+}
+
+async function requestJSON(url, headers = {}) {
+  const res = await fetch(url, {headers});
+  if (!res.ok) {
+    let detail = "";
+    try { detail = (await res.text()).slice(0,160); } catch {}
+    throw new Error(`HTTP ${res.status}${detail ? ": "+detail : ""}`);
+  }
+  return res.json();
+}
+
+function validKey(key) {
+  return key && !key.startsWith("PASTE_NEW_");
+}
+
+async function pexels(query, kind, page) {
+  if (!validKey(API.PEXELS)) throw Error("Pexels API key কনফিগার করা নেই");
+  const video = kind === "video";
+  const u = new URL(video
+    ? "https://api.pexels.com/videos/search"
+    : "https://api.pexels.com/v1/search");
+  u.searchParams.set("query", query);
+  u.searchParams.set("page", page);
+  u.searchParams.set("per_page", "80");
+  const d = await requestJSON(u.href, {Authorization:API.PEXELS});
+  const rows = video ? (d.videos || []) : (d.photos || []);
+  return {
+    items: rows.map(x => {
+      if (video) {
+        const f = (x.video_files || [])
+          .filter(v => v.link && (!v.file_type || v.file_type.includes("video")))
+          .sort((a,b)=>(b.width||0)-(a.width||0))[0];
+        return {
+          id:"pxv"+x.id, title:"Pexels video "+x.id,
+          source:"Pexels", image:x.image, url:x.url,
+          download:f?.link || x.url, video:true
+        };
+      }
+      return {
+        id:"pxp"+x.id, title:x.alt || "Pexels photo",
+        source:"Pexels", image:x.src?.large || x.src?.medium,
+        url:x.url, download:x.src?.original || x.url, video:false
+      };
+    }),
+    more:!!d.next_page
+  };
+}
+
+async function pixabay(query, kind, page) {
+  if (!validKey(API.PIXABAY)) throw Error("Pixabay API key কনফিগার করা নেই");
+  const video = kind === "video";
+  const u = new URL(video
+    ? "https://pixabay.com/api/videos/"
+    : "https://pixabay.com/api/");
+  u.searchParams.set("key",API.PIXABAY);
+  u.searchParams.set("q",query);
+  u.searchParams.set("page",page);
+  u.searchParams.set("per_page","200");
+  u.searchParams.set("safesearch","true");
+  if (!video) u.searchParams.set("image_type","all");
+  const d = await requestJSON(u.href);
+  const rows = d.hits || [];
+  return {
+    items: rows.map(x => {
+      if (video) {
+        const f = Object.values(x.videos || {})
+          .sort((a,b)=>(b.width||0)-(a.width||0))[0];
+        return {
+          id:"pbv"+x.id,title:x.tags || "Pixabay video",
+          source:"Pixabay",image:"",url:`https://pixabay.com/videos/id-${x.id}/`,
+          download:f?.url || `https://pixabay.com/videos/`,video:true
+        };
+      }
+      return {
+        id:"pbp"+x.id,title:x.tags || "Pixabay photo",
+        source:"Pixabay",image:x.webformatURL || x.previewURL,
+        url:x.pageURL,download:x.largeImageURL || x.webformatURL || x.pageURL,
+        video:false
+      };
+    }),
+    more:page*200 < (d.totalHits || 0)
+  };
+}
+
+async function unsplash(query, page) {
+  if (!validKey(API.UNSPLASH)) throw Error("Unsplash Access Key কনফিগার করা নেই");
+  const u = new URL("https://api.unsplash.com/search/photos");
+  u.searchParams.set("query",query);
+  u.searchParams.set("page",page);
+  u.searchParams.set("per_page","30");
+  const d = await requestJSON(u.href,{
+    Authorization:"Client-ID "+API.UNSPLASH
+  });
+  return {
+    items:(d.results || []).map(x=>({
+      id:"us"+x.id,title:x.alt_description || x.description || "Unsplash photo",
+      source:"Unsplash",image:x.urls?.regular,
+      url:x.links?.html,download:x.links?.download_location || x.links?.html,
+      video:false
+    })),
+    more:page*30 < (d.total || 0)
+  };
+}
+
+function providers(query, kind) {
+  const source = $("source").value;
+  const all = [];
+  if (source === "all" || source === "pexels")
+    all.push({name:"Pexels",run:p=>pexels(query,kind,p)});
+  if (source === "all" || source === "pixabay")
+    all.push({name:"Pixabay",run:p=>pixabay(query,kind,p)});
+  if (kind === "photo" && (source === "all" || source === "unsplash"))
+    all.push({name:"Unsplash",run:p=>unsplash(query,p)});
+  return all;
+}
+
+function renderCards(items) {
+  const grid = document.createElement("div");
+  grid.className = "resultgrid";
+  items.forEach(x=>{
+    const image = safeURL(x.image);
+    const page = safeURL(x.url);
+    const download = safeURL(x.download) || page;
+    const card = document.createElement("article");
+    card.className = "media";
+    let preview;
+    if (x.video && download) {
+      // Video preview only when the returned link is actually a playable file.
+      preview = `<div style="aspect-ratio:4/3;display:grid;place-items:center;color:#58e7ff">▶<br><small>ভিডিও দেখতে Open source চাপো</small></div>`;
+    } else if (image) {
+      preview = `<img loading="lazy" alt="${escapeHTML(x.title)}" src="${escapeHTML(image)}">`;
+    } else {
+      preview = `<div style="aspect-ratio:4/3;display:grid;place-items:center;color:#9aa9c0">✦ MEDIA</div>`;
+    }
+
+    card.innerHTML = `
+      ${preview}
+      <div class="media-body">
+        <div class="media-title">${escapeHTML(x.title)}</div>
+        <div class="source">${escapeHTML(x.source)}</div>
+        <div class="media-actions">
+          <a href="${escapeHTML(download || page || "#")}" target="_blank" rel="noopener noreferrer">
+            <button class="primary" type="button">↓ Download</button>
+          </a>
+          <a href="${escapeHTML(page || download || "#")}" target="_blank" rel="noopener noreferrer">
+            <button class="secondary" type="button">Open ↗</button>
+          </a>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  return grid;
+}
+
+async function collectMore(job, target, bubble) {
+  if (job.busy || job.done) return;
+  job.busy = true;
+  const seen = new Set(job.results.map(x=>x.id));
+  const startCount = job.results.length;
+
+  try {
+    while (job.results.length < target && !job.done) {
+      if (job.cancelled) return;
+      const pending = job.providers.filter(p=>!job.dead.has(p.name));
+      if (!pending.length) { job.done = true; break; }
+
+      const outcomes = await Promise.all(pending.map(async p=>{
+        try {
+          const d = await p.run(job.pages[p.name] || 1);
+          job.pages[p.name] = (job.pages[p.name] || 1)+1;
+          if (!d.more || !d.items.length) job.dead.add(p.name);
+          return {name:p.name,items:d.items};
+        } catch(e) {
+          job.dead.add(p.name);
+          job.errors.push(p.name+": "+e.message);
+          return {name:p.name,items:[]};
+        }
+      }));
+
+      for (const o of outcomes) {
+        for (const item of o.items) {
+          if (!seen.has(item.id)) {
+            seen.add(item.id);
+            job.results.push(item);
+          }
+        }
+      }
+      // No endless loop if all sources have stopped producing results.
+      if (job.results.length === startCount && outcomes.every(o=>!o.items.length)) {
+        job.done = true;
+        break;
+      }
+    }
+
+    job.results = job.results.slice(0,target);
+    activeResults = job.results;
+    bubble.innerHTML = "";
+    bubble.append(
+      document.createTextNode(
+        `খোঁজ শেষ! ${job.results.length}টি রেজাল্ট পাওয়া গেছে।`
+      )
+    );
+
+    if (job.results.length) bubble.appendChild(renderCards(job.results));
+    if (job.results.length < target) {
+      const p = document.createElement("p");
+      p.className = "muted";
+      p.textContent = `তুমি ${target}টি চেয়েছিলে, কিন্তু এখন ${job.results.length}টি পাওয়া গেছে। API-র সীমা, উপলভ্য ফলাফল বা নেটওয়ার্কের কারণে সংখ্যা কম হতে পারে।`;
+      bubble.appendChild(p);
+    }
+
+    const links = sourceLinks(job.query,job.kind);
+    const sourceP = document.createElement("p");
+    sourceP.className = "muted";
+    sourceP.textContent = "আরও খুঁজতে মূল সোর্স: ";
+    for (const [name,url] of Object.entries(links)) {
+      const a = document.createElement("a");
+      a.href=url;a.target="_blank";a.rel="noopener noreferrer";
+      a.style.color="#58e7ff";a.style.marginRight="10px";
+      a.textContent=name;
+      sourceP.appendChild(a);
+    }
+    bubble.appendChild(sourceP);
+
+    if (job.errors.length) {
+      const err = document.createElement("p");
+      err.className="muted";
+      err.textContent="কিছু সোর্সে সমস্যা হয়েছে। API key, অনুমতি ও rate limit পরীক্ষা করো।";
+      bubble.appendChild(err);
+    }
+    bubble.scrollIntoView({behavior:"smooth",block:"nearest"});
+  } finally {
+    job.busy = false;
+  }
+}
+
+async function sendMessage(textOverride) {
+  if (currentJob?.busy) return;
+  const text = (textOverride ?? $("prompt").value).trim();
+  if (!text) return;
+  $("prompt").value = "";
+  addMessage("user",escapeHTML(text));
+
+  let target, kind;
+  try {
+    target = getRequestedCount(text);
+    const lower = text.toLowerCase();
+    const explicitVideo = /ভিডিও|video|clip|ফুটেজ/.test(lower);
+    const explicitPhoto = /ছবি|ছবির|photo|picture|image/.test(lower);
+    kind = explicitVideo ? "video" : explicitPhoto ? "photo" : $("kind").value;
+    $("count").value = target;
+    $("kind").value = kind;
+  } catch(e) {
+    addMessage("bot",escapeHTML(e.message));
+    return;
+  }
+
+  activeQuery = normalizeQuery(text);
+  if (!activeQuery) activeQuery = text;
+  const bubble = loadingBubble(activeQuery);
+
+  if ($("source").value === "mixkit") {
+    const url = sourceLinks(activeQuery,kind).Mixkit;
+    bubble.innerHTML = `Mixkit-এ ${escapeHTML(activeQuery)} খুঁজতে এই লিংকটি খোলো:<p><a style="color:#58e7ff" target="_blank" rel="noopener noreferrer" href="${escapeHTML(url)}">Mixkit Search ↗</a></p><p class="muted">Mixkit-এর জন্য এখানে সরাসরি API সংযোগ নেই।</p>`;
+    return;
+  }
+
+  const job = {
+    query:activeQuery,kind,providers:providers(activeQuery,kind),
+    results:[],pages:{},dead:new Set(),errors:[],
+    busy:false,done:false,cancelled:false
+  };
+  currentJob = job;
+
+  if (!job.providers.length) {
+    bubble.textContent="এই মিডিয়া ধরনের জন্য কোনো সার্চ সোর্স নির্বাচন করা নেই।";
+    return;
+  }
+
+  await collectMore(job,target,bubble);
+}
+
+$("send").addEventListener("click",()=>sendMessage());
+$("prompt").addEventListener("keydown",e=>{
+  if(e.key==="Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+$("filterBtn").addEventListener("click",()=>$("filters").classList.toggle("show"));
+document.querySelectorAll("[data-prompt]").forEach(btn=>{
+  btn.addEventListener("click",()=>sendMessage(btn.dataset.prompt));
+});
+</script>
+</body>
+</html>
